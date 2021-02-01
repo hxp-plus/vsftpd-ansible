@@ -1,0 +1,6 @@
+ftpconfig:
+  enable_anonymous_user: yes       # Set to no will disallow anonyous login
+  chroot_local_user: yes           # Set to no will allow users accessing other user's home directory
+  anonymous_root: /var/ftp/        # Set the root for anomymous user
+  anonymous_subdir: uploads        # Define which subdirectory anomyous user should upload to
+  server_public_ip: 8.210.122.179  # Your server's public ip

@@ -1,0 +1,12 @@
+---
+- name: Install vsftpd on ftpservers
+  hosts: ftpserver
+  roles:
+    - vsftpd
+  pre_tasks:
+    - name: Check system requirements
+      debug:
+        msg: "Debian 10 is supported"
+      failed_when: ansible_os_family != "Debian" or ansible_lsb.major_release != "10"
+      any_errors_fatal: True
+

@@ -1,0 +1,50 @@
+---
+# tasks file for vsftpd
+- name: Disable SELinux
+  block:
+    - selinux:
+        state: disabled
+  rescue:
+    - debug:
+        msg: "IGNORING: SELinux not installed"
+- name: Configure ufw
+  block:
+    - ufw:
+        rule: allow
+        port: ftp
+  rescue:
+    - debug:
+        msg: "IGNORING: ufw is not running"
+- name: Install vsftpd
+  apt:
+    name: vsftpd
+    state: present
+    update_cache: yes
+  when: ansible_pkg_mgr == "apt"
+- debug:
+    msg: "{{ ftpconfig.enable_anonymous_user }}"
+- name: Create root for anonymous user
+  file:
+    path: "{{ ftpconfig.anonymous_root }}"
+    state: directory
+    recurse: yes
+    owner: nobody
+    group: nogroup
+    mode: '0755'
+  when: ftpconfig.enable_anonymous_user
+- name: Create subdirectory for anonymous user to upload to
+  file:
+    path: "{{ ftpconfig.anonymous_root }}/{{ ftpconfig.anonymous_subdir }}"
+    state: directory
+    recurse: yes
+    owner: nobody
+    group: nogroup
+    mode: '0777'
+- name: Create vsftpd.conf
+  template:
+    src: vsftpd.conf.j2
+    dest: /etc/vsftpd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart vsftpd
